@@ -1,4 +1,4 @@
-import { BaseItem, ItemFilters } from '../types';
+import { Car, CarFilters } from '../types';
 
 /**
  * A generic CRUD service for the marketplace entity.
@@ -7,92 +7,137 @@ import { BaseItem, ItemFilters } from '../types';
  */
 
 // Mock storage
-let mockItems: BaseItem[] = [
+let mockCars: Car[] = [
   {
     id: '1',
-    sellerId: 'user-1',
+    title: '2022 Honda City V MT',
+    brand: 'Honda',
+    model: 'City',
+    year: 2022,
+    price: 1150000,
+    fuelType: 'Petrol',
+    transmission: 'Manual',
+    kmDriven: 12500,
+    ownerType: '1st',
+    location: 'Mumbai',
+    color: 'Radiant Red',
+    description: 'Immaculate condition Honda City. Single owner, rarely driven. Complete service history available.',
+    image: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&q=80&w=800',
+    sellerId: 'admin',
     createdAt: new Date().toISOString(),
-    title: 'Example Listing 1',
-    description: 'This is a mocked item. It shows how the UI will look.',
-    price: 99.99,
-    condition: 'New', // Dynamic field
-    images: ['https://via.placeholder.com/600x400?text=Image+1'],
+    status: 'available'
   },
   {
     id: '2',
-    sellerId: 'user-2',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    title: 'Example Listing 2',
-    description: 'Another mocked item to demonstrate grids.',
-    price: 150.00,
-    condition: 'Used - Good', // Dynamic field
-    images: ['https://via.placeholder.com/600x400?text=Image+2'],
+    title: '2020 Hyundai Creta SX(O)',
+    brand: 'Hyundai',
+    model: 'Creta',
+    year: 2020,
+    price: 1575000,
+    fuelType: 'Diesel',
+    transmission: 'Automatic',
+    kmDriven: 35000,
+    ownerType: '1st',
+    location: 'Bangalore',
+    color: 'Polar White',
+    description: 'Top-end Creta with panoramic sunroof. All original paint, new tires replaced last month.',
+    image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800',
+    sellerId: 'admin',
+    createdAt: new Date().toISOString(),
+    status: 'available'
+  },
+  {
+    id: '3',
+    title: '2019 Maruti Swift VXI',
+    brand: 'Maruti Suzuki',
+    model: 'Swift',
+    year: 2019,
+    price: 525000,
+    fuelType: 'Petrol',
+    transmission: 'Manual',
+    kmDriven: 42000,
+    ownerType: '2nd',
+    location: 'Delhi',
+    color: 'Magma Grey',
+    description: 'Well maintained Swift. Good fuel efficiency and recently serviced. Insurance valid till 2025.',
+    image: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&q=80&w=800',
+    sellerId: 'admin',
+    createdAt: new Date().toISOString(),
+    status: 'available'
   }
 ];
 
 export const itemService = {
   /**
-   * Fetch all items, optionally filtered
+   * Fetch all cars, optionally filtered
    */
-  async getItems(filters?: ItemFilters): Promise<BaseItem[]> {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 600));
+  async getItems(filters?: CarFilters): Promise<Car[]> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    let results = [...mockItems];
-    
+    let results = [...mockCars];
+
     if (filters?.searchTerm) {
       const term = filters.searchTerm.toLowerCase();
-      results = results.filter((item) => 
-        item.title.toLowerCase().includes(term) || 
-        item.description.toLowerCase().includes(term)
+      results = results.filter((car) => 
+        car.title.toLowerCase().includes(term) || 
+        car.brand.toLowerCase().includes(term) ||
+        car.model.toLowerCase().includes(term)
       );
     }
-    
-    // Add logic for dynamic attributes or price filters as needed...
+
+    if (filters?.brand) {
+      results = results.filter(car => car.brand === filters.brand);
+    }
+
+    if (filters?.minPrice) {
+      results = results.filter(car => car.price >= filters.minPrice!);
+    }
+
+    if (filters?.maxPrice) {
+      results = results.filter(car => car.price <= filters.maxPrice!);
+    }
 
     return results;
   },
 
   /**
-   * Fetch a single item by ID
+   * Fetch a single car by ID
    */
-  async getItemById(id: string): Promise<BaseItem | null> {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    return mockItems.find((item) => item.id === id) || null;
+  async getItemById(id: string): Promise<Car | null> {
+    return mockCars.find((car) => car.id === id) || null;
   },
 
   /**
-   * Create a new item listing
+   * Create a new car listing
    */
-  async createItem(itemData: Omit<BaseItem, 'id' | 'createdAt'>): Promise<BaseItem> {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const newItem: BaseItem = {
-      ...itemData,
+  async createItem(carData: Omit<Car, 'id' | 'createdAt' | 'status'>): Promise<Car> {
+    const newCar: Car = {
+      ...carData,
       id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString(),
+      status: 'available'
     };
-    mockItems.push(newItem);
-    return newItem;
+    mockCars.unshift(newCar);
+    return newCar;
   },
 
   /**
-   * Update an existing item
+   * Update an existing car
    */
-  async updateItem(id: string, updates: Partial<BaseItem>): Promise<BaseItem> {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const index = mockItems.findIndex((item) => item.id === id);
-    if (index === -1) throw new Error('Item not found');
-    
-    const updated = { ...mockItems[index], ...updates };
-    mockItems[index] = updated;
+  async updateItem(id: string, updates: Partial<Car>): Promise<Car> {
+    const index = mockCars.findIndex((car) => car.id === id);
+    if (index === -1) throw new Error('Car not found');
+
+    const updated = { ...mockCars[index], ...updates };
+    mockCars[index] = updated;
     return updated;
   },
 
   /**
-   * Delete an item
+   * Delete a car
    */
   async deleteItem(id: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    mockItems = mockItems.filter((item) => item.id !== id);
+    mockCars = mockCars.filter((car) => car.id !== id);
   }
 };

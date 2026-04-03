@@ -3,92 +3,81 @@
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { appConfig } from "@/config/appConfig";
-import { Search, ShoppingCart, User, Menu, Bell } from "lucide-react";
+import { Search, Heart, User, Menu, Bell, Car, LogOut } from "lucide-react";
 
 export const Navbar = () => {
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
+  const wishlist = useStore((state) => state.wishlist);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl backdrop-saturate-150 border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm transition-all">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4 sm:gap-8">
+    <nav className="sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-950/90 backdrop-blur-2xl border-b border-gray-100 dark:border-gray-800 shadow-sm transition-all">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="flex h-20 items-center justify-between gap-8">
           
           {/* Logo & Brand */}
-          <div className="flex items-center gap-2 lg:gap-4 shrink-0">
-            <button className="lg:hidden p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition">
+          <div className="flex items-center gap-4 shrink-0">
+            <button className="lg:hidden p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition rounded-xl bg-gray-50 dark:bg-gray-900">
               <Menu size={24} />
             </button>
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black dark:bg-white text-white dark:text-black shadow-md transition-transform group-hover:scale-105">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-xl shadow-blue-500/20 group-hover:scale-110 transition-all duration-300">
+                <Car className="w-7 h-7" />
               </div>
-              <span className="text-2xl font-black tracking-tight text-gray-900 dark:text-white hidden sm:block">
-                {appConfig.appName}
+              <span className="text-2xl font-[1000] tracking-tighter text-gray-900 dark:text-white hidden sm:block uppercase italic">
+                Auto<span className="text-blue-600">Bazaar</span>
               </span>
             </Link>
           </div>
 
-          {/* Search Bar (Center) */}
-          <div className="flex-1 max-w-2xl hidden md:flex">
-            <div className="relative w-full group">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                <Search size={20} />
-              </div>
-              <input
-                type="text"
-                placeholder="Search for items, brands, or categories..."
-                className="w-full rounded-full border border-gray-200/80 bg-gray-50/80 dark:bg-gray-900/80 py-2.5 pl-10 pr-4 text-sm text-gray-900 dark:text-gray-100 focus:bg-white dark:focus:bg-gray-950 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 shadow-inner transition-all"
-              />
-              <button className="absolute inset-y-1 right-1 px-4 text-xs font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition shadow-sm hidden lg:block">
-                Search
-              </button>
-            </div>
+          {/* Nav Links (Desktop) */}
+          <div className="hidden lg:flex items-center gap-8 font-black text-xs uppercase tracking-widest text-gray-500">
+             <Link href="/" className="hover:text-blue-600 transition-colors">Marketplace</Link>
+             <Link href="/#browse" className="hover:text-blue-600 transition-colors">Sell Car</Link>
+             <Link href="/wishlist" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+                Wishlist
+                {wishlist.length > 0 && <span className="bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">{wishlist.length}</span>}
+             </Link>
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            <button className="hidden sm:flex p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-900">
-              <Bell size={22} />
-            </button>
-            <button className="flex p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-900">
-              <ShoppingCart size={22} />
-            </button>
-            
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1 hidden sm:block"></div>
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="hidden sm:flex h-10 w-px bg-gray-100 dark:bg-gray-800 mx-2"></div>
 
             {user ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{user.email?.split('@')[0]}</span>
-                  <span className="text-xs text-gray-500 capitalize">{user.role}</span>
-                </div>
+              <div className="flex items-center gap-4">
+                <Link 
+                  href="/profile"
+                  className="flex items-center gap-3 p-1 pr-4 rounded-2xl bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all border border-transparent hover:border-blue-100"
+                >
+                  <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-blue-600 text-white font-black">
+                    {user.email[0].toUpperCase()}
+                  </div>
+                  <div className="hidden lg:flex flex-col items-start leading-none">
+                    <span className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tighter">{user.name?.split(' ')[0] || "Profile"}</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.role}</span>
+                  </div>
+                </Link>
+                
                 <button
                   onClick={() => setUser(null)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700 transition"
+                  className="p-3 text-gray-400 hover:text-red-500 transition rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10"
                   title="Logout"
                 >
-                  <User size={20} />
+                   <LogOut className="w-5 h-5" />
                 </button>
-                {user.role === "admin" && (
-                  <Link href="/dashboard" className="hidden lg:flex px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-full transition">
-                    Dashboard
-                  </Link>
-                )}
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Link
                   href="/login"
-                  className="hidden sm:flex px-4 py-2 text-sm font-bold text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white transition"
+                  className="hidden sm:flex px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-700 hover:text-blue-600 transition"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/login"
-                  className="px-5 py-2 text-sm font-bold text-white bg-black dark:bg-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-100 shadow-md transition transform hover:-translate-y-0.5"
+                  className="px-6 py-3 text-xs font-black uppercase tracking-widest text-white bg-blue-600 rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-500/20 transition transform hover:-translate-y-0.5"
                 >
                   Sign up
                 </Link>
@@ -97,22 +86,8 @@ export const Navbar = () => {
           </div>
         </div>
       </div>
-
-      {/* Categories Bar */}
-      <div className="border-t border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 hidden md:block">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ul className="flex items-center gap-8 py-2.5 overflow-x-auto no-scrollbar text-sm font-medium text-gray-600 dark:text-gray-400">
-            {['All Categories', 'Electronics', 'Fashion', 'Home & Garden', 'Sports', 'Motors', 'Collectibles', 'Deals'].map((cat) => (
-              <li key={cat}>
-                <button className="whitespace-nowrap hover:text-black dark:hover:text-white transition-colors relative group">
-                  {cat}
-                  <span className="absolute -bottom-2.5 left-0 w-0 h-0.5 bg-black dark:bg-white transition-all group-hover:w-full"></span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
     </nav>
   );
 };
+
+

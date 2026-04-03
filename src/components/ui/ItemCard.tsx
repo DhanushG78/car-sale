@@ -1,71 +1,96 @@
-import { appConfig } from "@/config/appConfig";
-import { deleteItem } from "@/services/itemService";
+import { useStore } from "@/store/useStore";
+import { Car } from "@/modules/items/types";
+import { Heart } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
-  item: Record<string, any>;
-  onEdit?: (item: any) => void;
-  onDelete?: () => void;
+  item: Car;
+  onEdit?: (item: Car) => void;
+  onDelete?: (id: string) => void;
 };
 
 export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
-  const { ui, fields } = appConfig;
-
-  // Find image and price dynamically based on config
-  const imageField = fields.find(f => f.type === 'file' || f.name === 'image' || f.name === 'images');
-  const priceField = fields.find(f => f.type === 'number' && f.name === 'price');
-  const titleField = fields.find(f => f.name === 'title' || f.name === 'name' || f.name === 'brand');
-
-  const imageValue = imageField ? item[imageField.name] : null;
-  const imgSrc = Array.isArray(imageValue) ? imageValue[0] : imageValue;
-  const uiShowImage = ui?.showImage !== false;
-
-  const priceValue = priceField ? item[priceField.name] : null;
-  const uiShowPrice = ui?.showPrice !== false;
-
-  let titleValue = item.title;
-  if (!titleValue) {
-    titleValue = titleField ? item[titleField.name] : "Untitled Item";
-  }
+  const { wishlist, toggleWishlist } = useStore();
+  const isWishlisted = wishlist.includes(item.id);
 
   const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this item?")) {
-      await deleteItem(item.id);
-      onDelete?.();
+    if (confirm("Are you sure you want to delete this listing?")) {
+      onDelete?.(item.id);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col h-full group">
-      {uiShowImage && (
-        <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-          <img 
-            src={imgSrc || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"} 
-            alt={titleValue} 
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
-          />
+    <div className="group bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 dark:border-gray-800 flex flex-col h-full relative">
+      {/* Badge for New/Sold */}
+      {item.status === 'sold' ? (
+        <div className="absolute top-4 left-4 z-10 bg-red-600 text-white text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+          Sold
+        </div>
+      ) : (
+        <div className="absolute top-4 left-4 z-10 bg-green-600 text-white text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+          Available
         </div>
       )}
 
-      <div className="p-5 flex flex-col flex-grow">
-        <h2 className="font-semibold text-lg text-gray-900 dark:text-gray-100 line-clamp-1 mb-1">{titleValue}</h2>
+      {/* Wishlist Button */}
+      <button 
+        onClick={(e) => { e.stopPropagation(); toggleWishlist(item.id); }}
+        className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 ${
+          isWishlisted 
+            ? "bg-red-500 text-white" 
+            : "bg-white/80 dark:bg-black/40 text-gray-900 dark:text-white hover:bg-red-50"
+        }`}
+      >
+        <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
+      </button>
+
+      <div className="relative h-56 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <img 
+          src={item.image || "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80"} 
+          alt={item.title} 
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-2">
+          <h2 className="font-bold text-xl text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            {item.title}
+          </h2>
+        </div>
         
-        {uiShowPrice && priceValue !== undefined && priceValue !== null && (
-          <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">₹ {Number(priceValue).toLocaleString()}</p>
-        )}
+        <p className="text-2xl font-black text-gray-900 dark:text-white mb-4">
+          ₹ {Number(item.price).toLocaleString()}
+        </p>
 
-        {/* Fallback rendering for any additional fields could be placed here if needed */}
+        {/* Spec Chips */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200 dark:border-gray-700">
+            📅 {item.year}
+          </span>
+          <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200 dark:border-gray-700">
+            🛣️ {Number(item.kmDriven).toLocaleString()} km
+          </span>
+          <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200 dark:border-gray-700">
+            ⛽ {item.fuelType}
+          </span>
+        </div>
 
-        <div className="mt-auto pt-5 flex gap-2">
+        <div className="mt-auto pt-4 flex gap-3">
           {(!onEdit && !onDelete) ? (
-            <button className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 rounded-xl font-semibold shadow-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+            <Link 
+              href={`/cars/${item.id}`}
+              className="w-full bg-blue-600 dark:bg-blue-500 text-white py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 dark:hover:bg-blue-600 transform hover:-translate-y-0.5 transition-all text-center"
+            >
               View Details
-            </button>
+            </Link>
           ) : (
-            <div className="flex w-full gap-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+            <>
               {onEdit && (
                 <button
                   onClick={() => onEdit(item)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-2.5 rounded-xl font-medium text-sm transition-colors"
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 py-3 rounded-2xl font-bold text-sm transition-all border border-gray-200 dark:border-gray-700"
                 >
                   Edit
                 </button>
@@ -73,15 +98,16 @@ export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
               {onDelete && (
                 <button
                   onClick={handleDelete}
-                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 py-2.5 rounded-xl font-medium text-sm transition-colors"
+                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 py-3 rounded-2xl font-bold text-sm transition-all border border-red-100 dark:border-red-900/30"
                 >
                   Delete
                 </button>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
     </div>
   );
 };
+
