@@ -11,20 +11,18 @@ import Link from "next/link";
 export default function CarDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [car, setCar] = useState<Car | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cars = useStore((state) => state.cars);
   const { toggleWishlist, wishlist } = useStore();
+  const [loading, setLoading] = useState(true);
+
+  const car = cars.find((c) => c.id === id);
 
   useEffect(() => {
-    const fetchCar = async () => {
-      if (typeof id === 'string') {
-        const data = await itemService.getItemById(id);
-        setCar(data);
-      }
-      setLoading(false);
-    };
-    fetchCar();
+    // Artificial delay to show loading state if needed, but mostly for UX consistency
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, [id]);
+
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">

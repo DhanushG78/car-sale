@@ -5,10 +5,10 @@ export interface Car {
   model: string;
   year: number;
   price: number;
-  fuelType: "Petrol" | "Diesel" | "Electric" | "Hybrid";
-  transmission: "Manual" | "Automatic";
+  fuelType: "petrol" | "diesel" | "electric";
+  transmission: "manual" | "automatic";
   kmDriven: number;
-  ownerType: "1st" | "2nd" | "3rd" | "4th+";
+  ownerType: "1st" | "2nd" | "3rd";
   location: string;
   color: string;
   description: string;

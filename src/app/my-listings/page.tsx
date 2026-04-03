@@ -1,14 +1,33 @@
 "use client";
 
-import { useItems } from "@/modules/items";
+import { useItems, ItemForm } from "@/modules/items";
 import { ItemCard } from "@/components/ui/ItemCard";
 import { useStore } from "@/store/useStore";
-import { Car, Plus, ArrowLeft, MoreVertical } from "lucide-react";
+import { Car, Plus, ArrowLeft, MoreVertical, X } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 
 export default function MyListingsPage() {
+  const [mounted, setMounted] = useState(false);
   const { items, loading, fetchItems, deleteItem } = useItems();
+  const [editingItem, setEditingItem] = useState<any>(null);
   const { user } = useStore();
+  const isSeller = useStore((state) => state.isSeller());
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !loading && !isSeller) {
+      router.push("/");
+    }
+  }, [isSeller, loading, router, mounted]);
+
+  if (!mounted || !isSeller) return null;
 
   const myCars = items.filter(car => car.sellerId === user?.id || car.sellerId === 'admin');
 
@@ -32,6 +51,25 @@ export default function MyListingsPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 pb-32">
+        {editingItem && (
+          <section className="mb-12 bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-[2.5rem] border-2 border-dashed border-blue-200 dark:border-blue-800/50">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100">Editing Listing</h2>
+              <button onClick={() => setEditingItem(null)} className="flex items-center gap-2 text-sm font-black text-red-600 uppercase tracking-widest">
+                 <X className="w-4 h-4" /> Cancel
+              </button>
+            </div>
+            <ItemForm 
+              key={editingItem.id} 
+              initialData={editingItem} 
+              onSuccess={() => {
+                setEditingItem(null);
+                fetchItems();
+              }} 
+            />
+          </section>
+        )}
+
         {loading ? (
            <div className="py-24 flex flex-col items-center justify-center">
              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -53,7 +91,7 @@ export default function MyListingsPage() {
               <ItemCard 
                 key={car.id} 
                 item={car} 
-                onEdit={(c) => console.log('Edit', c)}
+                onEdit={(c) => setEditingItem(c)}
                 onDelete={(id) => { deleteItem(id); fetchItems(); }}
               />
             ))}
@@ -61,5 +99,6 @@ export default function MyListingsPage() {
         )}
       </main>
     </div>
+
   );
 }

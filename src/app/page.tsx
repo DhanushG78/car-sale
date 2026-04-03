@@ -3,14 +3,21 @@
 import { useItems, ItemForm } from "@/modules/items";
 import { ItemCard } from "@/components/ui/ItemCard";
 import { Hero } from "@/components/sections/Hero";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "@/store/useStore";
 import { Filter, X, ChevronRight, SlidersHorizontal, Search } from "lucide-react";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const { items, loading, fetchItems, deleteItem } = useItems();
   const [editingItem, setEditingItem] = useState<any>(null);
   const user = useStore((state) => state.user);
+  const isSeller = useStore((state) => state.isSeller());
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   
   // Real-time Filtering State
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,8 +27,9 @@ export default function Home() {
   const [selectedFuel, setSelectedFuel] = useState("All Fuels");
   const [selectedTransmission, setSelectedTransmission] = useState("All");
 
-  const brands = ["All Brands", "Honda", "Hyundai", "Maruti Suzuki", "Toyota", "Tata", "Mahindra", "Kia"];
-  const fuels = ["All Fuels", "Petrol", "Diesel", "Electric", "Hybrid"];
+  const brands = ["All Brands", "Hyundai", "Honda", "Maruti Suzuki", "Toyota", "Tata", "Mahindra"];
+  const fuels = ["All Fuels", "petrol", "diesel", "electric"];
+
 
   // Filter Items Array 
   const filteredItems = items.filter((car: any) => {
@@ -140,11 +148,11 @@ export default function Home() {
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Transmission</label>
                   <div className="grid grid-cols-2 gap-2">
-                    {["All", "Manual", "Automatic"].map(type => (
+                    {["All", "manual", "automatic"].map(type => (
                       <button
                         key={type}
                         onClick={() => setSelectedTransmission(type)}
-                        className={`py-3 rounded-xl text-xs font-bold transition-all border ${
+                        className={`py-3 rounded-xl text-xs font-bold transition-all border uppercase tracking-widest ${
                           selectedTransmission === type 
                             ? "bg-gray-900 dark:bg-white text-white dark:text-black border-gray-900 dark:border-white shadow-md" 
                             : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400"
@@ -155,6 +163,7 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
+
               </div>
             </div>
           </aside>
@@ -181,9 +190,9 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Admin Section if needed */}
-            {user?.role === "admin" && (
-              <section className="mb-12 bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-[2.5rem] border-2 border-dashed border-blue-200 dark:border-blue-800/50">
+            {/* Admin/Seller Section if needed */}
+            {mounted && isSeller && (
+              <section id="sell-form" className="mb-12 bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-[2.5rem] border-2 border-dashed border-blue-200 dark:border-blue-800/50">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100">{editingItem ? 'Editing Listing' : 'Create New Listing'}</h2>
                   {editingItem && (
@@ -202,6 +211,8 @@ export default function Home() {
                 />
               </section>
             )}
+
+
 
             {loading ? (
                <div className="py-32 flex flex-col items-center justify-center w-full">
@@ -228,10 +239,11 @@ export default function Home() {
                   <ItemCard 
                     key={car.id} 
                     item={car} 
-                    onEdit={user?.role === 'admin' ? (i) => setEditingItem(i) : undefined}
-                    onDelete={user?.role === 'admin' ? (id) => { deleteItem(id); fetchItems(); } : undefined}
+                    onEdit={(user?.role === 'admin' || car.sellerId === user?.id) ? (i) => setEditingItem(i) : undefined}
+                    onDelete={(user?.role === 'admin' || car.sellerId === user?.id) ? (id) => { deleteItem(id); fetchItems(); } : undefined}
                   />
                 ))}
+
               </div>
             )}
           </div>

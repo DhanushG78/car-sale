@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { useStore } from "@/store/useStore";
+
+import { useState, useEffect } from "react";
 
 export const Hero = () => {
+  const [mounted, setMounted] = useState(false);
+  const isSeller = useStore((state) => state.isSeller());
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="relative isolate overflow-hidden bg-white dark:bg-gray-950 pt-16">
       {/* Background Image with Overlay */}
@@ -43,14 +53,19 @@ export const Hero = () => {
             <Search className="w-5 h-5 flex-shrink-0" />
             Browse Cars
           </Link>
-          <Link 
-            href="/login" 
-            className="group flex items-center justify-center gap-3 text-lg font-black text-gray-900 dark:text-white px-10 py-5 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all w-full text-center"
-          >
-            Sell Your Car
-            <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-          </Link>
+          {mounted && !isSeller && (
+            <Link 
+              href="/login" 
+              className="group flex items-center justify-center gap-3 text-lg font-black text-gray-900 dark:text-white px-10 py-5 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all w-full text-center"
+            >
+              Sell Your Car
+              <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </Link>
+          )}
         </div>
+
+
+
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 pt-16 border-t border-gray-100 dark:border-gray-800/50 w-full">

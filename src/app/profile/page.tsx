@@ -4,23 +4,39 @@ import { useStore } from "@/store/useStore";
 import { useItems } from "@/modules/items";
 import { User, Mail, Shield, Car, Heart, LogOut, Settings, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function ProfilePage() {
+  const [mounted, setMounted] = useState(false);
   const { user, setUser, wishlist } = useStore();
   const { items } = useItems();
 
-  const myListingCount = items.filter(car => car.sellerId === user?.id || car.sellerId === 'admin').length;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (!user) return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 px-6 text-center">
-      <div className="flex flex-col gap-6">
-        <h1 className="text-4xl font-black text-gray-900 dark:text-white">Please login to view profile</h1>
-        <Link href="/login" className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs">
-          Go to Login
-        </Link>
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 px-6 text-center">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white">Please login to view profile</h1>
+          <Link href="/login" className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs">
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const myListingCount = items.filter(car => car.sellerId === user.id || car.sellerId === 'admin').length;
 
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen pb-32">

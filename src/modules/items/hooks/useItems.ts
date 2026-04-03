@@ -1,35 +1,30 @@
 import { useEffect, useState } from "react";
-import { itemService } from "../services/item.service";
-import { Car } from "../types";
+import { useStore } from "@/store/useStore";
 
 export const useItems = () => {
-  const [items, setItems] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cars = useStore((state) => state.cars);
+  const deleteCar = useStore((state) => state.deleteCar);
+  const [loading, setLoading] = useState(false);
 
+  // We keep fetchItems for compatibility + loading state simulation
   const fetchItems = async () => {
     setLoading(true);
-    try {
-      const data = await itemService.getItems();
-      setItems(data);
-    } catch (error) {
-      console.error("Failed to fetch items:", error);
-    } finally {
-      setLoading(false);
-    }
+    // Simulation of small delay
+    await new Promise(r => setTimeout(r, 500));
+    setLoading(false);
   };
 
   const deleteItem = async (id: string) => {
-    try {
-      await itemService.deleteItem(id);
-      await fetchItems();
-    } catch (error) {
-      console.error("Failed to delete item:", error);
-    }
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 300));
+    deleteCar(id);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchItems();
   }, []);
 
-  return { items, loading, fetchItems, deleteItem };
-};
+  return { items: cars, loading, fetchItems, deleteItem };
+};
+
