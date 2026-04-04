@@ -9,26 +9,37 @@ import { Car, User as UserIcon, ShoppingCart, ShieldCheck } from "lucide-react";
 export default function LoginPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"buyer" | "seller">("buyer");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
   const router = useRouter();
-  const setUser = useStore((state) => state.setUser);
+  const login = useStore((state) => state.login);
+  const register = useStore((state) => state.register);
   const { appName } = useAppConfig();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !password.trim()) return;
+    
+    setLoading(true);
+    setError("");
 
-    const dummyUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: name || email.split("@")[0],
-      email: email,
-      role: email === "admin@gmail.com" ? "admin" : role,
-      createdAt: new Date().toISOString()
-    };
-
-    setUser(dummyUser);
-    router.push("/");
+    try {
+      if (isRegister) {
+        await register(email, password, name || email.split("@")[0], role);
+      } else {
+        await login(email, password);
+      }
+      router.push("/");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An error occurred during authentication");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,6 +105,24 @@ export default function LoginPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Password</label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                className="w-full rounded-2xl border-none bg-gray-50 dark:bg-gray-800 px-5 py-4 font-medium focus:ring-4 focus:ring-blue-500/10 dark:text-gray-100 transition shadow-sm"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-xs font-bold border border-red-100 dark:border-red-900/30">
+                ⚠️ {error}
+              </div>
+            )}
+
             {/* Role Selection (Only for Register) */}
             {isRegister && (
               <div className="space-y-3">
@@ -126,14 +155,16 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-2xl shadow-blue-500/30 hover:bg-blue-700 transition transform hover:-translate-y-1 active:scale-95"
+            disabled={loading}
+            className={`w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-2xl shadow-blue-500/30 hover:bg-blue-700 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
           >
+            {loading && <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
             {isRegister ? "Create Account" : "Sign In"}
           </button>
 
           {!isRegister && (
              <div className="text-center font-bold text-xs text-gray-400 uppercase tracking-widest py-4 border-t border-gray-100 dark:border-gray-800">
-                Tip: Login as <span className="text-blue-600">admin@gmail.com</span> for admin features
+                Securely synced with <span className="text-blue-600">Firebase</span> base cloud
              </div>
           )}
         </form>

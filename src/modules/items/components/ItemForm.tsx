@@ -18,11 +18,14 @@ export const ItemForm = ({ initialData = {}, onSuccess }: Props) => {
 
   const handleChange = (name: string, value: any) => {
     if (value instanceof File) {
-      const imageUrl = URL.createObjectURL(value);
-      setFormData((prev: any) => ({
-        ...prev,
-        [name]: imageUrl,
-      }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev: any) => ({
+          ...prev,
+          [name]: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(value);
     } else {
       setFormData((prev: any) => ({
         ...prev,
@@ -47,16 +50,10 @@ export const ItemForm = ({ initialData = {}, onSuccess }: Props) => {
       }
 
       if (formData.id) {
-        updateCar(formData as any);
+        const { id, ...updateData } = formData;
+        await updateCar(id, updateData);
       } else {
-        const newCar = {
-          ...formData,
-          id: Math.random().toString(36).substr(2, 9),
-          sellerId: user?.id || "anonymous",
-          createdAt: new Date().toISOString(),
-          status: "available"
-        };
-        addCar(newCar as any);
+        await addCar(formData as any);
         setFormData({});
       }
       
@@ -94,6 +91,18 @@ export const ItemForm = ({ initialData = {}, onSuccess }: Props) => {
               value={formData[field.name]}
               onChange={handleChange}
             />
+            {field.name === 'image' && formData['image'] && (
+              <div className="mt-4 relative group aspect-video overflow-hidden rounded-2xl border-4 border-gray-100 dark:border-gray-800 shadow-xl">
+                 <img 
+                   src={formData['image']} 
+                   alt="Car Preview" 
+                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                 />
+                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-xs font-black uppercase tracking-widest">Image Preview</span>
+                 </div>
+              </div>
+            )}
           </div>
         ))}
       </div>

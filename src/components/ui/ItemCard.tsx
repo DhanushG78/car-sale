@@ -1,6 +1,6 @@
 import { useStore } from "@/store/useStore";
 import { Car } from "@/modules/items/types";
-import { Heart } from "lucide-react";
+import { Heart, ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
@@ -10,8 +10,9 @@ type Props = {
 };
 
 export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
-  const { wishlist, toggleWishlist } = useStore();
+  const { wishlist, toggleWishlist, compareList, addToCompare } = useStore();
   const isWishlisted = wishlist.includes(item.id);
+  const isInCompare = compareList.some((c) => c.id === item.id);
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this listing?")) {
@@ -79,12 +80,26 @@ export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
 
         <div className="mt-auto pt-4 flex gap-3">
           {(!onEdit && !onDelete) ? (
-            <Link 
-              href={`/cars/${item.id}`}
-              className="w-full bg-blue-600 dark:bg-blue-500 text-white py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 dark:hover:bg-blue-600 transform hover:-translate-y-0.5 transition-all text-center"
-            >
-              View Details
-            </Link>
+            <div className="flex gap-2 w-full">
+              <Link 
+                href={`/cars/${item.id}`}
+                className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 dark:hover:bg-blue-600 transform hover:-translate-y-0.5 transition-all text-center"
+              >
+                View Details
+              </Link>
+              <button
+                onClick={(e) => { e.preventDefault(); addToCompare(item); }}
+                disabled={isInCompare}
+                className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold transform hover:-translate-y-0.5 transition-all text-sm border ${
+                  isInCompare
+                    ? "bg-gray-100 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 cursor-not-allowed"
+                    : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm"
+                }`}
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                {isInCompare ? "Added" : "Compare"}
+              </button>
+            </div>
           ) : (
             <>
               {onEdit && (

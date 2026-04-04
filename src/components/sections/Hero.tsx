@@ -14,14 +14,15 @@ export const Hero = () => {
 
   return (
     <div className="relative isolate overflow-hidden bg-white dark:bg-gray-950 pt-16">
-      {/* Background Image with Overlay */}
+      {/* Background Image with High Clarity Overlays */}
       <div className="absolute inset-0 -z-10 h-full w-full">
         <img
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000"
-          alt="Car background"
-          className="h-full w-full object-cover opacity-10 dark:opacity-20"
+          src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=100&w=3000"
+          alt="High-clarity luxury car background"
+          className="h-full w-full object-cover brightness-[0.95] contrast-[1.05]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-white dark:from-gray-950 dark:via-gray-950/80 dark:to-gray-950" />
+        <div className="absolute inset-0 bg-white/10 dark:bg-gray-950/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white dark:from-gray-950/10 dark:via-transparent dark:to-gray-950" />
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 flex flex-col items-center text-center relative">
@@ -33,14 +34,14 @@ export const Hero = () => {
           Trusted by 1M+ Drivers
         </div>
 
-        <h1 className="text-6xl font-[1000] tracking-tighter text-gray-900 dark:text-white sm:text-8xl mb-8 leading-[0.9]">
+        <h1 className="text-6xl font-[1000] tracking-tighter text-gray-900 dark:text-white sm:text-8xl mb-8 leading-[0.9] drop-shadow-2xl">
           Find Your Perfect <br className="hidden sm:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-300 drop-shadow-none">
             Used Car 🚗
           </span>
         </h1>
 
-        <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mb-12 font-medium">
+        <p className="mt-4 text-xl text-gray-800 dark:text-gray-100 max-w-2xl mb-12 font-bold drop-shadow-sm">
           The most reliable platform to buy and sell certified pre-owned cars. 
           Expert inspections, instant valuation, and paperless transfers.
         </p>
@@ -67,17 +68,17 @@ export const Hero = () => {
 
 
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 pt-16 border-t border-gray-100 dark:border-gray-800/50 w-full">
+        {/* Stats Row with Glassmorphism */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 px-8 py-10 rounded-[3rem] bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl w-full">
            {[
              { label: "Cars Listed", value: "25k+" },
              { label: "Happy Sellers", value: "10k+" },
              { label: "Years Experience", value: "12+" },
              { label: "Cities Covered", value: "50+" }
            ].map((stat, i) => (
-             <div key={i} className="flex flex-col gap-1">
-               <span className="text-3xl font-black text-gray-900 dark:text-white">{stat.value}</span>
-               <span className="text-xs font-black uppercase tracking-widest text-gray-400">{stat.label}</span>
+             <div key={i} className="flex flex-col gap-1 border-r border-gray-100 dark:border-white/10 last:border-0 pr-4">
+               <span className="text-3xl font-[1000] text-gray-900 dark:text-white drop-shadow-sm">{stat.value}</span>
+               <span className="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300 drop-shadow-sm">{stat.label}</span>
              </div>
            ))}
         </div>

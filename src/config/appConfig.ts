@@ -22,7 +22,7 @@ export const appConfig: AppConfig = {
     { name: "location", label: "Location", type: "text", required: true, placeholder: "e.g. Mumbai, Maharashtra" },
     { name: "color", label: "Color", type: "text", required: false, placeholder: "e.g. Pearl White" },
     { name: "description", label: "Description", type: "textarea", required: true },
-    { name: "image", label: "Car Image URL", type: "text", required: true, placeholder: "Paste image URL here" },
+    { name: "image", label: "Car Image", type: "file", required: true, placeholder: "Upload car image" },
   ],
 
   features: {

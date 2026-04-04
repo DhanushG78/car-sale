@@ -12,6 +12,7 @@ export const Navbar = () => {
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
   const wishlist = useStore((state) => state.wishlist);
+  const compareList = useStore((state) => state.compareList);
   const isSeller = useStore((state) => state.isSeller());
 
   useEffect(() => {
@@ -29,6 +30,12 @@ export const Navbar = () => {
             Wishlist
             {wishlist.length > 0 && <span className="bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">{wishlist.length}</span>}
          </Link>
+         {compareList.length > 0 && (
+            <Link href="/compare" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+               Compare
+               <span className="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">{compareList.length}</span>
+            </Link>
+         )}
       </div>
 
       <div className="flex items-center gap-4 shrink-0">
