@@ -109,11 +109,3 @@ Open [http://localhost:3000](http://localhost:3000) to see the result.
 - **Dynamic Config**: The `src/config/appConfig.ts` file allows for easy modification of car attributes (fields, labels, types) without updating the entire UI logic.
 
 ---
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Built with ❤️ by [DhanushG78](https://github.com/DhanushG78)
