@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyChKxuISWieAxRlIBGMESoerRLGcUfTWBo",
   authDomain: "used-car-marketplace-9b3a4.firebaseapp.com",
   projectId: "used-car-marketplace-9b3a4",
-  storageBucket: "used-car-marketplace-9b3a4.firebasestorage.app",
+  storageBucket: "used-car-marketplace-9b3a4.appspot.com",
   messagingSenderId: "422898935713",
   appId: "1:422898935713:web:43441285d5b3c8645a0de0"
 };

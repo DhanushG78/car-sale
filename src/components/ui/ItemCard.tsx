@@ -76,6 +76,9 @@ export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
           <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200 dark:border-gray-700">
             ⛽ {item.fuelType}
           </span>
+          <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200 dark:border-gray-700 capitalize">
+            ⚙️ {item.transmission}
+          </span>
         </div>
 
         <div className="mt-auto pt-4 flex gap-3">

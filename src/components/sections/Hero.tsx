@@ -54,13 +54,21 @@ export const Hero = () => {
             <Search className="w-5 h-5 flex-shrink-0" />
             Browse Cars
           </Link>
-          {mounted && !isSeller && (
+          {mounted && !isSeller ? (
             <Link 
               href="/login" 
               className="group flex items-center justify-center gap-3 text-lg font-black text-gray-900 dark:text-white px-10 py-5 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all w-full text-center"
             >
               Sell Your Car
               <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </Link>
+          ) : (
+            <Link 
+              href="#sell-form" 
+              className="group flex items-center justify-center gap-3 text-lg font-black text-white px-10 py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 shadow-2xl shadow-indigo-500/25 transition-all w-full text-center"
+            >
+              Post My Car
+              <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform font-mono">⚡</span>
             </Link>
           )}
         </div>

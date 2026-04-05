@@ -33,8 +33,11 @@ export const DynamicField = ({ field, value, onChange }: Props) => {
         <input
           type="number"
           placeholder={field.label}
-          value={value || ""}
-          onChange={(e) => onChange(field.name, Number(e.target.value))}
+          value={value === undefined || value === null ? "" : value}
+          onChange={(e) => {
+            const val = e.target.value;
+            onChange(field.name, val === "" ? "" : Number(val));
+          }}
           className={baseClasses}
         />
       );

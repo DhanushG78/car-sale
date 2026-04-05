@@ -22,6 +22,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL, uploadBytes } from "firebase/storage";
 import { Car } from "@/modules/items/types";
+import { compressImage } from "@/lib/imageUtils";
 
 export type User = {
   id: string;
@@ -68,22 +69,52 @@ type Store = {
   init: () => () => void;
 };
 
-// Helper for image upload
+// Optimized helper for image upload - handles hangs gracefully
 const uploadImage = async (imageSource: string | File): Promise<string> => {
   if (typeof imageSource === 'string' && !imageSource.startsWith('data:')) {
     return imageSource; // Already a URL
   }
 
   const storageRef = ref(storage, `cars/${Date.now()}_${Math.random().toString(36).substring(7)}`);
-  
-  if (typeof imageSource === 'string') {
-    // Handle Base64
-    const uploadResult = await uploadString(storageRef, imageSource, 'data_url');
-    return await getDownloadURL(uploadResult.ref);
-  } else {
-    // Handle File object
-    const uploadResult = await uploadBytes(storageRef, imageSource);
-    return await getDownloadURL(uploadResult.ref);
+  const isString = typeof imageSource === 'string';
+
+  try {
+    // Add a race condition: upload vs 10s timeout
+    const uploadTask = isString
+      ? uploadString(storageRef, imageSource, 'data_url')
+      : uploadBytes(storageRef, imageSource);
+
+    // After 10s, we stop waiting and just use the fallback if it's a string
+    const timeout = new Promise<null>((resolve, reject) => 
+      setTimeout(() => {
+        if (isString) {
+          console.warn("Storage upload taking too long, falling back to local source.");
+          resolve(null); // Resolve to null to indicate a fallback
+        } else {
+          reject(new Error("File upload timed out."));
+        }
+      }, 10000)
+    );
+
+    const result = await Promise.race([uploadTask, timeout]);
+
+    if (result === null) {
+       // Timeout happened but we have a base64 fallback
+       return imageSource as string;
+    }
+
+    return await getDownloadURL(result.ref);
+
+  } catch (error: any) {
+    console.error("Firebase Storage error:", error);
+    if (isString) {
+      // Final size check for Firestore
+      if (imageSource.length > 1040000) {
+        throw new Error("Image is too large. Even compressed it exceeds database limits.");
+      }
+      return imageSource;
+    }
+    throw error;
   }
 };
 
@@ -126,16 +157,26 @@ export const useStore = create<Store>((set, get) => ({
     
     let imageUrl = carData.image;
     if (imageUrl) {
-      imageUrl = await uploadImage(imageUrl as any);
+      try {
+        imageUrl = await uploadImage(imageUrl as any);
+      } catch (e: any) {
+        throw new Error(`Failed to process image: ${e.message}`);
+      }
     }
     
-    await addDoc(collection(db, "cars"), {
-      ...carData,
-      image: imageUrl,
-      sellerId: user.id,
-      createdAt: new Date().toISOString(),
-      status: "available"
-    });
+    try {
+      const docRef = await addDoc(collection(db, "cars"), {
+        ...carData,
+        image: imageUrl || "",
+        sellerId: user.id || user.email,
+        createdAt: new Date().toISOString(),
+        status: "available"
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e: any) {
+      console.error("Error adding document: ", e);
+      throw new Error(`Database error: ${e.message}`);
+    }
   },
   updateCar: async (id, carData) => {
     let imageUrl = carData.image;
@@ -224,12 +265,16 @@ export const useStore = create<Store>((set, get) => ({
                   let imageUrl = car.image;
                   if (imageUrl && imageUrl.startsWith('data:')) {
                     try {
+                      // Compressing during migration to prevent Firestore limit errors
+                      if (imageUrl.length > 500000) {
+                        imageUrl = await compressImage(imageUrl, 1000, 1000, 0.6);
+                      }
                       imageUrl = await uploadImage(imageUrl);
                     } catch (e) {
                       console.error("Migration image upload failed", e);
                     }
                   }
-                  batch.set(newRef, { ...car, image: imageUrl, sellerId: userId, id: newRef.id });
+                  batch.set(newRef, { ...car, image: imageUrl || "", sellerId: userId, id: newRef.id });
                }
                await batch.commit();
              }

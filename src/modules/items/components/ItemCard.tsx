@@ -4,16 +4,15 @@ import { deleteItem } from "@/services/itemService";
 type Props = {
   item: Record<string, any>;
   onEdit?: (item: any) => void;
-  onDelete?: () => void;
+  onDelete?: (id: string) => void;
 };
 
 export const ItemCard = ({ item, onEdit, onDelete }: Props) => {
   const { ui, fields } = appConfig;
 
   const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this listing?")) {
-      await deleteItem(item.id);
-      onDelete?.();
+    if (onDelete && confirm("Are you sure you want to delete this listing?")) {
+      onDelete(item.id);
     }
   };
 

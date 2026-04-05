@@ -23,36 +23,53 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
+  const [minYear, setMinYear] = useState<number | "">("");
+  const [maxKmDriven, setMaxKmDriven] = useState<number | "">("");
   const [selectedBrand, setSelectedBrand] = useState("All Brands");
   const [selectedFuel, setSelectedFuel] = useState("All Fuels");
   const [selectedTransmission, setSelectedTransmission] = useState("All");
+  const [selectedOwner, setSelectedOwner] = useState("All Owners");
+  const [sortBy, setSortBy] = useState("Latest");
 
-  const brands = ["All Brands", "Hyundai", "Honda", "Maruti Suzuki", "Toyota", "Tata", "Mahindra"];
+  const brands = ["All Brands", "Hyundai", "Honda", "Maruti Suzuki", "Toyota", "Tata", "Mahindra", "BMW", "Audi", "Mercedes-Benz"];
   const fuels = ["All Fuels", "petrol", "diesel", "electric"];
+  const owners = ["All Owners", "1st", "2nd", "3rd"];
 
-
-  // Filter Items Array 
-  const filteredItems = items.filter((car: any) => {
+  // Filter and Sort Items Array 
+  const filteredAndSortedItems = items.filter((car: any) => {
     const matchesSearch = car.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           car.model.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesMinPrice = minPrice === "" ? true : car.price >= minPrice;
     const matchesMaxPrice = maxPrice === "" ? true : car.price <= maxPrice;
+    const matchesMinYear = minYear === "" ? true : car.year >= minYear;
+    const matchesMaxKm = maxKmDriven === "" ? true : car.kmDriven <= maxKmDriven;
     const matchesBrand = selectedBrand === "All Brands" ? true : car.brand === selectedBrand;
     const matchesFuel = selectedFuel === "All Fuels" ? true : car.fuelType === selectedFuel;
     const matchesTransmission = selectedTransmission === "All" ? true : car.transmission === selectedTransmission;
+    const matchesOwner = selectedOwner === "All Owners" ? true : car.ownerType === selectedOwner;
 
-    return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesBrand && matchesFuel && matchesTransmission;
+    return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesMinYear && matchesMaxKm && matchesBrand && matchesFuel && matchesTransmission && matchesOwner;
+  }).sort((a: any, b: any) => {
+    if (sortBy === "Price: Low to High") return a.price - b.price;
+    if (sortBy === "Price: High to Low") return b.price - a.price;
+    if (sortBy === "Newest Year") return b.year - a.year;
+    if (sortBy === "Latest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return 0;
   });
 
   const clearFilters = () => {
     setSearchTerm("");
     setMinPrice("");
     setMaxPrice("");
+    setMinYear("");
+    setMaxKmDriven("");
     setSelectedBrand("All Brands");
     setSelectedFuel("All Fuels");
     setSelectedTransmission("All");
+    setSelectedOwner("All Owners");
+    setSortBy("Latest");
   };
 
   return (
@@ -64,7 +81,7 @@ export default function Home() {
           
           {/* Sidebar / Filters Panel */}
           <aside className="w-full lg:w-80 flex-shrink-0">
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800/50 sticky top-24">
+            <div className="bg-gray-50 dark:bg-gray-900/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800/50 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="font-black text-2xl text-gray-900 dark:text-gray-100 flex items-center gap-3">
                   <SlidersHorizontal className="w-6 h-6 text-blue-600" />
@@ -107,6 +124,30 @@ export default function Home() {
                       placeholder="Max"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                      className="w-full rounded-2xl border-none bg-white dark:bg-gray-800 px-4 py-4 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 dark:text-gray-100 transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Year and KM */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Min Year</label>
+                    <input
+                      type="number"
+                      placeholder="2015"
+                      value={minYear}
+                      onChange={(e) => setMinYear(e.target.value === "" ? "" : Number(e.target.value))}
+                      className="w-full rounded-2xl border-none bg-white dark:bg-gray-800 px-4 py-4 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 dark:text-gray-100 transition-all shadow-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Max KM</label>
+                    <input
+                      type="number"
+                      placeholder="50000"
+                      value={maxKmDriven}
+                      onChange={(e) => setMaxKmDriven(e.target.value === "" ? "" : Number(e.target.value))}
                       className="w-full rounded-2xl border-none bg-white dark:bg-gray-800 px-4 py-4 text-sm font-medium focus:ring-4 focus:ring-blue-500/10 dark:text-gray-100 transition-all shadow-sm"
                     />
                   </div>
@@ -164,6 +205,26 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* Owner Type */}
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Owner Type</label>
+                  <div className="flex flex-wrap gap-2">
+                    {owners.map(owner => (
+                      <button
+                        key={owner}
+                        onClick={() => setSelectedOwner(owner)}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
+                          selectedOwner === owner 
+                            ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20" 
+                            : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-200"
+                        }`}
+                      >
+                        {owner}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
           </aside>
@@ -176,12 +237,16 @@ export default function Home() {
                 <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-gray-100 mb-1">
                   Available Cars
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 font-medium">{filteredItems.length} matching result{filteredItems.length !== 1 && 's'}</p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">{filteredAndSortedItems.length} matching result{filteredAndSortedItems.length !== 1 && 's'}</p>
               </div>
               
               <div className="flex items-center gap-4">
                  <span className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Sort by</span>
-                 <select className="bg-transparent font-black text-gray-900 dark:text-white border-none focus:ring-0 cursor-pointer">
+                 <select 
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="bg-transparent font-black text-gray-900 dark:text-white border-none focus:ring-0 cursor-pointer"
+                 >
                     <option>Latest</option>
                     <option>Price: Low to High</option>
                     <option>Price: High to Low</option>
@@ -213,13 +278,12 @@ export default function Home() {
             )}
 
 
-
             {loading ? (
                <div className="py-32 flex flex-col items-center justify-center w-full">
                  <div className="w-16 h-16 border-4 border-gray-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
                  <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Searching for cars...</p>
                </div>
-            ) : filteredItems.length === 0 ? (
+            ) : filteredAndSortedItems.length === 0 ? (
                <div className="py-32 flex flex-col items-center justify-center w-full text-center px-4 bg-gray-50 dark:bg-gray-900/40 rounded-[3rem] border border-gray-100 dark:border-gray-800">
                  <div className="w-24 h-24 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center mb-8 shadow-xl">
                    <Search className="w-10 h-10 text-gray-300" />
@@ -234,8 +298,8 @@ export default function Home() {
                  </button>
                </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-8">
-                {filteredItems.map((car: any) => (
+               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-8">
+                {filteredAndSortedItems.map((car: any) => (
                   <ItemCard 
                     key={car.id} 
                     item={car} 
