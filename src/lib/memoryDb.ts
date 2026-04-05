@@ -1,10 +1,5 @@
-import { BaseItem } from '@/modules/items';
-
 // In-memory data store for the template.
-// Warning: This data will reset whenever the Next.js development server restarts. 
-// In production on serverless, this array is ephemeral and will lose data frequently.
-// Hook this up to a real database (Postgres, Firebase, MongoDB) for production use.
-export let itemsDb: BaseItem[] = [
+export let itemsDb: any[] = [
   {
     id: '1',
     sellerId: 'system-user',

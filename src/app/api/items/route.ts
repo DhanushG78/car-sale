@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { itemsDb } from '@/lib/memoryDb';
-import { BaseItem } from '@/modules/items';
 
 /**
  * GET /api/items

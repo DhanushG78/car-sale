@@ -3,7 +3,6 @@ export * from './types';
 
 // Export components
 export { ItemCard } from './components/ItemCard';
-export { ItemList } from './components/ItemList';
 export { ItemForm } from './components/ItemForm';
 
 // Export hooks
