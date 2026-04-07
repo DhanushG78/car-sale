@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Car } from "@/types/car";
 
 // Verified reliable high-quality car images from Unsplash (Generic but matching types)
@@ -507,3 +508,8 @@ export const locations = [
   "Jaipur",
   "Lucknow",
 ];
+=======
+import { Car } from "@/modules/items/types";
+
+export const dummyCars: Car[] = [];
+>>>>>>> a1a6ea26ca54eab8c6546f91c2993b340edb4007
